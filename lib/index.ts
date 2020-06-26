@@ -17,7 +17,7 @@ bot.on('message', async msg => {
     if(msg.content.startsWith('...stats') && msg.channel.id == logChId) {
         let emb = new Discord.RichEmbed().setColor('#9676ef').setAuthor('Statystyki')
         .addField('Serwery', bot.guilds.size, true).addField('Kanały', bot.channels.size, true)
-        .addField('Ost. Wiad.', `**${msg.author.tag}** w **${msg?.guild.name || 'DM'}**\n` + lastmsg?.content?.slice(0, 1000));
+        .addField('Ost. Wiad.', `**${lastmsg.author.tag}** w **${lastmsg?.guild.name || 'DM'}**\n` + lastmsg?.content?.slice(0, 1000));
         logChan.send(emb);
     }
     else if(msg.guild?.id == '426486206671355914')
