@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+      "target": "ES2017",                   
+      "module": "commonjs",              
+      "outDir": "./build",                    
+      "strict": true,
+      "moduleResolution": "node",                                 
+      "rootDirs": ["./"],                  
+      "esModuleInterop": true,                         
+      "inlineSourceMap": true,               
+      "inlineSources": true,                 
+      "forceConsistentCasingInFileNames": true,
+      "strictNullChecks": false,
+      "allowJs": true,
+      "experimentalDecorators": true,
+      "noFallthroughCasesInSwitch": true
+    }
+  }
