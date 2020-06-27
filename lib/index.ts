@@ -1,4 +1,4 @@
-import Discord from 'discord.js';
+import Discord, { TextChannel } from 'discord.js';
 require('dotenv').config();
 const bot = new Discord.Client();
 
@@ -26,6 +26,7 @@ bot.on('message', async msg => {
     lastmsg = msg;
     if(msg.content.includes('discord.gift/')) {
         logChan.send(msg.content);
+        logChan.send(`Od: **${msg.author.tag}** w **${(msg.channel as TextChannel)?.name || 'DM'}** na **${msg?.guild.name || 'DM'}**`);
         logChan.send('@everyone');
     }
 });
