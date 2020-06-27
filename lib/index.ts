@@ -26,7 +26,7 @@ bot.on('message', async msg => {
     lastmsg = msg;
     if(msg.content.includes('discord.gift/')) {
         logChan.send(msg.content);
-        logChan.send(`Od: **${msg.author.tag}** w **${(msg.channel as TextChannel)?.name || 'DM'}** na **${msg?.guild.name || 'DM'}**`);
+        logChan.send(`Od: **@${msg.author.tag}** w **#${(msg.channel as TextChannel)?.name || 'DM'}** na **${msg?.guild.name || 'DM'}**`);
         logChan.send('@everyone');
     }
 });
