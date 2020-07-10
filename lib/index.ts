@@ -29,7 +29,7 @@ bot.on('message', async msg => {
     
     lastmsg = msg;
     
-    let test = /discord\.gift\/([\d\w]{13,19})/i.exec(msg.content);
+    let test = /discord\.gift\/([\d\w]{13,19})(?: |$)/im.exec(msg.content);
     if(test) {
         let giftCode = test[1];
         if(usedList.includes(giftCode))
