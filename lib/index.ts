@@ -35,11 +35,15 @@ bot.on('message', async msg => {
         if(usedList.includes(giftCode))
             return;
         usedList.push(giftCode);
-        ax.post(`https://ptb.discordapp.com/api/v6/entitlements/gift-codes/${giftCode}/redeem`, null, {
+        ax.post(`https://discordapp.com/api/v6/entitlements/gift-codes/${giftCode}/redeem`, 
+        {
+            channel_id: null,
+            payment_source_id: null
+        }, 
+        {
             headers: {
                 Authorization: redeemToken, 
                 'Content-Type': 'application/json', 
-                payment_source_id: null
             },
             responseType: 'json',
             validateStatus: () => true
