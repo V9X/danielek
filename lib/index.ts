@@ -1,5 +1,6 @@
 import Discord, { TextChannel } from 'discord.js';
 import ax from 'axios';
+import { send } from 'process';
 require('dotenv').config();
 const bot = new Discord.Client();
 
@@ -29,29 +30,49 @@ bot.on('message', async msg => {
     
     lastmsg = msg;
     
-    let test = /discord\.gift\/([\d\w]{13,19})(?: |$)/im.exec(msg.content);
+    let test = /discord\.gift\/([\d\w]{1,19})(?: |$)/im.exec(msg.content);
     if(test) {
         let giftCode = test[1];
         if(usedList.includes(giftCode))
             return;
         usedList.push(giftCode);
-        ax.post(`https://discordapp.com/api/v6/entitlements/gift-codes/${giftCode}/redeem`, 
-        {
-            channel_id: null,
-            payment_source_id: null
-        }, 
-        {
-            headers: {
-                Authorization: redeemToken, 
-                'Content-Type': 'application/json', 
-            },
-            responseType: 'json',
-            validateStatus: () => true
-        }).then(resp => {
-            logChan.send("Wynik próby odebrania prezentu:\n\n" + JSON.stringify(resp.data, null, 2), {code: 'json', split: true});
-        });
+
+        if(giftCode.length > 16)
+            redeemCode(giftCode.slice(0, 16));
+        else if(giftCode.length < 16) {
+            let words = msg.content.replace(/[^0-9A-Za-z ]/g, '').split(' ').filter(s => (giftCode + s).length == 16);
+            if(words.length == 0)
+                return;
+            (async () => {
+                for(let word of words) {
+                    redeemCode(giftCode + word);
+                    await new Promise(r => setTimeout(r, 100));
+                }
+            })();
+        }
+        else
+            redeemCode(giftCode);
+        
         logChan.send(msg.content);
-        logChan.send(`Od: **@${msg.author.tag}**\nw **#${(msg.channel as TextChannel)?.name || 'DM'}**\nna **${msg.guild?.name || 'DM'}**\nkod: **${giftCode}**`);
-        //logChan.send('@everyone');
+        logChan.send(`Od: **@${msg.author.tag}**\nw **#${(msg.channel as TextChannel)?.name || 'DM'}**\nna **${msg.guild?.name || 'DM'}**`);
     }
 });
+
+function redeemCode(code: string) {
+    ax.post(`https://discordapp.com/api/v6/entitlements/gift-codes/${code}/redeem`, 
+    {
+        channel_id: null,
+        payment_source_id: null
+    }, 
+    {
+        headers: {
+            Authorization: redeemToken, 
+            'Content-Type': 'application/json', 
+        },
+        responseType: 'json',
+        validateStatus: () => true
+    }).then(resp => {
+        logChan.send(`kod: **${code}**`);
+        logChan.send("Wynik próby odebrania prezentu:\n\n" + JSON.stringify(resp.data, null, 2), {code: 'json', split: true});
+    });
+}
