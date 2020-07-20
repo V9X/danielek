@@ -70,7 +70,7 @@ async function redeemCode(code: string) {
             method: 'POST',
             headers: {
                 Authorization: redeemToken, 
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             }
         }, resp => {
             let body = '';
@@ -82,8 +82,8 @@ async function redeemCode(code: string) {
             
         });
         rq.write(`{
-            channel_id: null,
-            payment_source_id: null
+            "channel_id": null,
+            "payment_source_id": null
         }`);
         rq.end();
     }
