@@ -1,5 +1,5 @@
-import Discord, { TextChannel } from 'discord.js';
-import ax from 'axios';
+import Discord from 'discord.js';
+import https from 'https';
 require('dotenv').config();
 const bot = new Discord.Client();
 
@@ -40,9 +40,11 @@ bot.on('message', async msg => {
             return;
         usedList.push(giftCode);
 
-        if(giftCode.length > 16)
+        if(giftCode.length == 16)
+            redeemCode(giftCode);
+        else if(giftCode.length > 16)
             redeemCode(giftCode.slice(0, 16));
-        else if(giftCode.length < 16) {
+        else {
             let words = msg.content.replace(/[^0-9A-Za-z ]/g, '').split(' ').filter(s => (giftCode + s).length == 16);
             if(words.length == 0)
                 return;
@@ -53,29 +55,40 @@ bot.on('message', async msg => {
                 }
             })();
         }
-        else
-            redeemCode(giftCode);
         
         logChan.send(msg.content);
-        logChan.send(`Od: **@${msg.author.tag}**\nw **#${(msg.channel as TextChannel)?.name || 'DM'}**\nna **${msg.guild?.name || 'DM'}**`);
+        logChan.send(`Od: **@${msg.author.tag}**\nw **#${(msg.channel as Discord.TextChannel)?.name || 'DM'}**\nna **${msg.guild?.name || 'DM'}**`);
     }
 });
 
-function redeemCode(code: string) {
-    ax.post(`https://discordapp.com/api/v6/entitlements/gift-codes/${code}/redeem`, 
-    {
-        channel_id: null,
-        payment_source_id: null
-    }, 
-    {
-        headers: {
-            Authorization: redeemToken, 
-            'Content-Type': 'application/json', 
-        },
-        responseType: 'json',
-        validateStatus: () => true
-    }).then(resp => {
-        logChan.send(`kod: **${code}**`);
-        logChan.send("Wynik próby odebrania prezentu:\n\n" + JSON.stringify(resp.data, null, 2), {code: 'json', split: true});
-    });
+async function redeemCode(code: string) {
+    try {
+        let rq = https.request({
+            hostname: 'discordapp.com',
+            port: 443,
+            path: `/api/v6/entitlements/gift-codes/${code}/redeem`,
+            method: 'POST',
+            headers: {
+                Authorization: redeemToken, 
+                'Content-Type': 'application/json'
+            }
+        }, resp => {
+            let body = '';
+            resp.on('data', d => body += d);
+            resp.on('end', () => {
+                logChan.send(`kod: **${code}**`);
+                logChan.send("Wynik próby odebrania prezentu:\n\n" + JSON.stringify(JSON.parse(body), null, 2), {code: 'json', split: true});
+            });
+            
+        });
+        rq.write(`{
+            channel_id: null,
+            payment_source_id: null
+        }`);
+        rq.end();
+    }
+    catch(err) {
+        console.error(err);
+        logChan.send(`Request error:\n\n` + err.message);
+    }
 }
