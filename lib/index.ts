@@ -17,16 +17,16 @@ bot.on('ready', () => {
 });
 
 bot.on('message', async msg => {
-    if(msg?.guild.id == '426486206671355914') {
+    if(msg.guild?.id == '426486206671355914') {
         if(msg.content.startsWith('...stats')) {
             let emb = new Discord.RichEmbed().setColor('#9676ef').setAuthor('Statystyki')
             .addField('Serwery', bot.guilds.size, true).addField('Kanały', bot.channels.size, true)
             .addField('W filtrze', usedList.length, true)
             .addField('Ost. Wiad.', `**${lastmsg.author.tag}** w **${lastmsg?.guild.name || 'DM'}**\n` + lastmsg?.content?.slice(0, 1000));
-            logChan.send(emb);
+            msg.channel.send(emb);
         }
         else if(msg.content.startsWith('...ping')) {
-            logChan.send(new Discord.RichEmbed().setColor('#1ece00').setDescription(`**${msg.author.tag}** :ping_pong: ${(bot as any).ws.ping}ms`));
+            msg.channel.send(new Discord.RichEmbed().setColor('#1ece00').setDescription(`**${msg.author.tag}** :ping_pong: ${bot.ping}ms`));
         }
         return;
     }
