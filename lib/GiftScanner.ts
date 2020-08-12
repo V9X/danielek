@@ -63,7 +63,7 @@ export default class extends Client {
             }
             
             this.logChannel.send(msg.content);
-            this.logChannel.send(`Od: **@${msg.author.tag}**\nw **#${(msg.channel as TextChannel)?.name || 'DM'}**\nna **${msg.guild?.name || 'DM'}**`);
+            this.logChannel.send(`Od: **@${msg.author.tag}**\nw **#${(msg.channel as TextChannel)?.name || 'DM'}**\nna **${msg.guild?.name || 'DM'}**\nping **${this.ping} ms**`);
         }
     }
 
