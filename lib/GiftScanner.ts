@@ -1,6 +1,13 @@
 import { Client, TextChannel, Message, RichEmbed } from "discord.js";
 import https from 'https';
 
+interface GifterInfo {
+    id: string
+    username: string
+    avatar: string
+    discriminator: string
+}
+
 export default class extends Client {
     private readonly logId: string;
     private readonly logGuildId: string;
@@ -63,7 +70,7 @@ export default class extends Client {
             }
             
             this.logChannel.send(msg.content);
-            this.logChannel.send(`Od: **@${msg.author.tag}**\nw **#${(msg.channel as TextChannel)?.name || 'DM'}**\nna **${msg.guild?.name || 'DM'}**\nping **${this.ping} ms**`);
+            this.logChannel.send(`od: **@${msg.author.tag}**\nw **#${(msg.channel as TextChannel)?.name || 'DM'}**\nna **${msg.guild?.name || 'DM'}**\nping **${this.ping} ms**`);
         }
     }
 
@@ -94,8 +101,12 @@ export default class extends Client {
             }, resp => {
                 let body = '';
                 resp.on('data', d => body += d);
-                resp.on('end', () => {
+                resp.on('end', async () => {
                     this.logChannel.send(`kod: **${code}**`);
+                    if(JSON.parse(body).code == 50050) {
+                        let gifter = await this.getGiftCreatorInfo(code);
+                        this.logChannel.send(`gifter: **@${gifter.username}#${gifter.discriminator}**`);
+                    }
                     this.logChannel.send("Wynik próby odebrania prezentu:\n\n" + JSON.stringify(JSON.parse(body), null, 2), {code: 'json', split: true});
                 });
                 
@@ -110,5 +121,17 @@ export default class extends Client {
             console.error(err);
             this.logChannel.send(`Request error:\n\n` + err.message);
         }
+    }
+
+    private getGiftCreatorInfo(code: string): Promise<GifterInfo> {
+        return new Promise(res => {
+            https.get(`https://discordapp.com/api/v6/entitlements/gift-codes/${code}`, resp => {
+                let body = '';
+                resp.on('data', d => body += d);
+                resp.on('end', () => {
+                    res(JSON.parse(body).user);
+                });
+            });
+        });
     }
 }
