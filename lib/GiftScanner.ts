@@ -103,11 +103,14 @@ export default class extends Client {
                 resp.on('data', d => body += d);
                 resp.on('end', async () => {
                     this.logChannel.send(`kod: **${code}**`);
-                    if(JSON.parse(body).code == 50050) {
+                    let gift = JSON.parse(body);
+                    if(gift.code == 50050) {
                         let gifter = await this.getGiftCreatorInfo(code);
                         this.logChannel.send(`gifter: **@${gifter.username}#${gifter.discriminator}**`);
                     }
-                    this.logChannel.send("Wynik próby odebrania prezentu:\n\n" + JSON.stringify(JSON.parse(body), null, 2), {code: 'json', split: true});
+                    this.logChannel.send("Wynik próby odebrania prezentu:\n\n" + JSON.stringify(gift, null, 2), {code: 'json', split: true});
+                    if(gift.id)
+                        this.logChannel.send("@everyone");
                 });
                 
             });
