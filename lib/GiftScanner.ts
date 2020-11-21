@@ -69,7 +69,7 @@ export default class extends Client {
                 })();
             }
             
-            this.logChannel.send(msg.content);
+            this.logChannel.send(msg.content?.replace(/@everyone/g, '')?.replace(/@here/g, ''));
             this.logChannel.send(`od: **@${msg.author.tag}**\nw **#${(msg.channel as TextChannel)?.name || 'DM'}**\nna **${msg.guild?.name || 'DM'}**\nping **${this.ping} ms**`);
         }
     }
