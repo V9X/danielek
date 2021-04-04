@@ -19,6 +19,10 @@ export default class extends Client {
 
     constructor(token: string, rToken: string, logId: string, logGuildId: string, uList: string[]) {
         super();
+        ///@ts-ignore
+        const orgF = this.dataManager.newChannel;
+        ///@ts-ignore
+        this.dataManager.newChannel = (d, g) => [0,1,2,3,4,5,6].includes(d.type) && orgF.call(this.dataManager, d, g);
         this.token = token;
         this.redeemToken = rToken;
         this.logId = logId;
